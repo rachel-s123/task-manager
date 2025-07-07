@@ -1,0 +1,40 @@
+{
+    "name": "task-manager-electron",
+    "version": "1.0.0",
+    "description": "Professional Task Manager with Auto-Save",
+    "main": "main.js",
+    "scripts": {
+      "start": "electron .",
+      "dev": "electron . --dev",
+      "build": "electron-builder",
+      "dist": "npm run build"
+    },
+    "author": "Your Name",
+    "license": "MIT",
+    "devDependencies": {
+      "electron": "^27.0.0",
+      "electron-builder": "^24.0.0"
+    },
+    "build": {
+      "appId": "com.yourname.taskmanager",
+      "productName": "Task Manager",
+      "directories": {
+        "output": "dist"
+      },
+      "files": [
+        "main.js",
+        "preload.js",
+        "renderer.html",
+        "assets/**/*"
+      ],
+      "mac": {
+        "category": "public.app-category.productivity"
+      },
+      "win": {
+        "target": "nsis"
+      },
+      "linux": {
+        "target": "AppImage"
+      }
+    }
+  }

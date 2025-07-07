@@ -1,0 +1,1745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+    <style>
+        @font-face {
+            font-family: 'Abril Fatface';
+            src: url('assets/fonts/AbrilFatface-Regular 2.otf') format('opentype');
+            font-weight: 400;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Archivo';
+            src: url('assets/fonts/archivo/Archivo-Regular.ttf') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Archivo';
+            src: url('assets/fonts/archivo/Archivo-Medium.ttf') format('truetype');
+            font-weight: 500;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Archivo';
+            src: url('assets/fonts/archivo/Archivo-SemiBold.ttf') format('truetype');
+            font-weight: 600;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Archivo';
+            src: url('assets/fonts/archivo/Archivo-Bold.ttf') format('truetype');
+            font-weight: 700;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Archivo';
+            src: url('assets/fonts/archivo/Archivo-Italic.ttf') format('truetype');
+            font-weight: 400;
+            font-style: italic;
+        }
+        @font-face {
+            font-family: 'Archivo';
+            src: url('assets/fonts/archivo/Archivo-MediumItalic.ttf') format('truetype');
+            font-weight: 500;
+            font-style: italic;
+        }
+        @font-face {
+            font-family: 'Archivo';
+            src: url('assets/fonts/archivo/Archivo-SemiBoldItalic.ttf') format('truetype');
+            font-weight: 600;
+            font-style: italic;
+        }
+        @font-face {
+            font-family: 'Archivo';
+            src: url('assets/fonts/archivo/Archivo-BoldItalic.ttf') format('truetype');
+            font-weight: 700;
+            font-style: italic;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Archivo', Arial, sans-serif;
+            background: #fff;
+            color: #111;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .title {
+            font-family: 'Abril Fatface', serif;
+            font-size: 2.5rem;
+            font-weight: 400;
+            color: #0700ff;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+        
+        .date {
+            color: #222;
+            font-size: 1.1rem;
+            font-family: 'Archivo', Arial, sans-serif;
+        }
+        
+        .control-panel {
+            background: #fff;
+            border-radius: 18px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(7,0,255,0.04);
+            border: 1px solid #eee;
+            margin-bottom: 24px;
+        }
+        
+        .control-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .focus-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .icon {
+            width: 24px;
+            height: 24px;
+            padding: 8px;
+            background: #e2fc0b;
+            border-radius: 50%;
+            color: #0700ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+        
+        .select {
+            border: 1px solid #0700ff;
+            border-radius: 10px;
+            padding: 8px 12px;
+            font-size: 15px;
+            min-width: 200px;
+            background: #fff;
+            color: #111;
+            font-family: 'Archivo', Arial, sans-serif;
+            transition: border 0.2s;
+        }
+        
+        .select:focus {
+            outline: none;
+            border-color: #f50a68;
+            box-shadow: 0 0 0 2px #e2fc0b44;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 20px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            font-family: 'Archivo', Arial, sans-serif;
+        }
+        
+        .btn-primary {
+            background: #0700ff;
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: #1111ff;
+        }
+        
+        .btn-success {
+            background: #e2fc0b;
+            color: #0700ff;
+        }
+        .btn-success:hover {
+            background: #f7ff6b;
+        }
+        
+        .btn-secondary {
+            background: #f50a68;
+            color: #fff;
+        }
+        .btn-secondary:hover {
+            background: #c0084e;
+        }
+        
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 16px;
+            border-top: 1px solid #eee;
+            font-size: 14px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .checkbox {
+            width: 16px;
+            height: 16px;
+            accent-color: #0700ff;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #888;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #0700ff;
+            border-radius: 50%;
+        }
+        
+        .focus-banner {
+            margin-top: 16px;
+            padding: 16px;
+            background: #e2fc0b;
+            border: 1px solid #0700ff;
+            border-radius: 14px;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .focus-banner h3 {
+            color: #0700ff;
+            font-family: 'Abril Fatface', serif;
+            font-weight: 400;
+            margin-bottom: 4px;
+        }
+        .focus-banner p {
+            color: #111;
+            font-size: 15px;
+        }
+        
+        .priorities-section {
+            background: #f50a68;
+            border: 1px solid #0700ff;
+            border-radius: 18px;
+            padding: 24px;
+            margin-bottom: 24px;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .priorities-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .priorities-header h3 {
+            color: #fff;
+            font-family: 'Abril Fatface', serif;
+            font-weight: 400;
+        }
+        .priority-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #fff;
+            border: 1px solid #e2fc0b;
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+        
+        .projects-grid {
+            display: grid;
+            gap: 24px;
+        }
+        
+        .project-card {
+            background: #fff;
+            border-radius: 18px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(7,0,255,0.04);
+            border: 1.5px solid #eee;
+            transition: box-shadow 0.3s, border 0.3s;
+        }
+        .project-card:hover {
+            box-shadow: 0 6px 24px rgba(7,0,255,0.08);
+            border: 1.5px solid #0700ff;
+        }
+        .project-card.focused {
+            border-color: #0700ff;
+            box-shadow: 0 0 0 3px #e2fc0b55;
+        }
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+        .project-title-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .project-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: #e2fc0b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0700ff;
+            font-size: 1.7rem;
+        }
+        .project-icon.focused {
+            background: #0700ff;
+            color: #fff;
+        }
+        .project-title {
+            font-size: 1.25rem;
+            font-family: 'Abril Fatface', serif;
+            font-weight: 400;
+            color: #0700ff;
+            margin-bottom: 4px;
+        }
+        .project-client {
+            color: #111;
+            font-size: 14px;
+            font-family: 'Archivo', Arial, sans-serif;
+        }
+        .focus-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #0700ff;
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .progress-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .progress-text {
+            font-size: 14px;
+            color: #0700ff;
+            font-weight: 500;
+        }
+        .progress-bar {
+            width: 80px;
+            height: 8px;
+            background: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #0700ff;
+            transition: width 0.5s ease;
+        }
+        .progress-fill.focused {
+            background: #f50a68;
+        }
+        .progress-percentage {
+            font-size: 14px;
+            font-weight: 600;
+            color: #0700ff;
+        }
+        .project-context {
+            padding: 16px;
+            background: #f7f7f7;
+            border-left: 4px solid #e2fc0b;
+            border-radius: 10px;
+            margin-bottom: 16px;
+        }
+        .project-context.focused {
+            background: #e2fc0b22;
+            border-left-color: #0700ff;
+        }
+        .context-text {
+            color: #111;
+        }
+        .context-label {
+            font-weight: 600;
+            color: #0700ff;
+        }
+        .tasks-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            background: #fff;
+            transition: border 0.2s, box-shadow 0.2s;
+        }
+        .task-item:hover {
+            border-color: #0700ff;
+            box-shadow: 0 2px 8px #e2fc0b33;
+        }
+        .task-item.completed {
+            background: #e2fc0b22;
+            border-color: #e2fc0b;
+        }
+        .task-item.priority {
+            background: #f50a6822;
+            border-color: #f50a68;
+        }
+        .task-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: background 0.2s, color 0.2s, transform 0.2s;
+            color: #0700ff;
+            font-size: 1.1rem;
+        }
+        .task-btn:hover {
+            background: #e2fc0b44;
+            transform: scale(1.1);
+        }
+        .task-btn.active {
+            color: #f50a68;
+        }
+        .task-btn.priority {
+            color: #f50a68;
+        }
+        .task-text {
+            flex: 1;
+            color: #111;
+            font-family: 'Archivo', Arial, sans-serif;
+        }
+        .task-text.completed {
+            text-decoration: line-through;
+            color: #888;
+        }
+        .task-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #0700ff;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: 'Archivo', Arial, sans-serif;
+        }
+        .task-input:focus {
+            outline: none;
+            border-color: #f50a68;
+            box-shadow: 0 0 0 2px #e2fc0b44;
+        }
+        .task-actions {
+            display: flex;
+            gap: 4px;
+        }
+        .add-task {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: #f7f7f7;
+            border: 2px dashed #0700ff;
+            border-radius: 12px;
+            transition: border 0.2s, background 0.2s;
+        }
+        .add-task:hover {
+            border-color: #f50a68;
+            background: #e2fc0b22;
+        }
+        .add-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #111;
+            font-size: 15px;
+            font-family: 'Archivo', Arial, sans-serif;
+        }
+        .add-input::placeholder {
+            color: #888;
+        }
+        .add-btn {
+            background: #0700ff;
+            color: #fff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .add-btn:hover {
+            background: #f50a68;
+        }
+        .success-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #0700ff;
+            color: #fff;
+            padding: 16px;
+            border-radius: 10px;
+            max-width: 300px;
+            font-size: 14px;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(7,0,255,0.10);
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(100%); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .icon-svg {
+            width: 16px;
+            height: 16px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .hidden {
+            display: none;
+        }
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .modal-overlay.hidden {
+            display: none;
+        }
+        .modal-content {
+            background: #fff;
+            border-radius: 18px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(7,0,255,0.10);
+            position: relative;
+            z-index: 1001;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 24px 0 24px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 24px;
+        }
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-family: 'Abril Fatface', serif;
+            font-weight: 400;
+            color: #0700ff;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #888;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: background 0.2s, color 0.2s;
+        }
+        .modal-close:hover {
+            background: #e2fc0b44;
+            color: #0700ff;
+        }
+        .modal-body {
+            padding: 0 24px 24px 24px;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            padding: 16px 24px 24px 24px;
+            border-top: 1px solid #eee;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #0700ff;
+            font-family: 'Archivo', Arial, sans-serif;
+        }
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #0700ff;
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: 'Archivo', Arial, sans-serif;
+            transition: border 0.2s;
+        }
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #f50a68;
+            box-shadow: 0 0 0 2px #e2fc0b44;
+        }
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .focus-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .focus-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: border 0.2s, background 0.2s;
+        }
+        .focus-option:hover {
+            border-color: #0700ff;
+            background: #e2fc0b22;
+        }
+        .focus-option.selected {
+            border-color: #0700ff;
+            background: #e2fc0b;
+        }
+        .focus-option input[type="radio"] {
+            accent-color: #0700ff;
+        }
+        .focus-option-content {
+            flex: 1;
+        }
+        .focus-option-title {
+            font-family: 'Abril Fatface', serif;
+            font-weight: 400;
+            color: #0700ff;
+            margin-bottom: 4px;
+        }
+        .focus-option-client {
+            font-size: 14px;
+            color: #111;
+            font-family: 'Archivo', Arial, sans-serif;
+        }
+        @media (max-width: 768px) {
+            .control-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .project-header {
+                flex-direction: column;
+                gap: 16px;
+            }
+            .progress-group {
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">Task Manager</h1>
+            <p class="date" id="current-date"></p>
+        </div>
+
+        <div class="control-panel">
+            <div class="control-row">
+                <div class="focus-group">
+                    <div class="icon">🎯</div>
+                    <div>
+                        <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 4px;">
+                            Today's Focus
+                        </label>
+                        <select class="select" id="focus-select">
+                            <option value="">Select focus project...</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" id="focus-mode-btn">
+                    <span>🔍</span> Focus Mode
+                </button>
+
+                <button class="btn btn-success" id="save-btn">
+                    <span>💾</span> Save All
+                </button>
+                
+                <button class="btn btn-secondary" id="add-project-btn">
+                    <span>➕</span> Add Project
+                </button>
+            </div>
+
+            <div class="status-row">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="auto-save" class="checkbox" checked>
+                    <label for="auto-save" style="color: #374151; font-weight: 500;">Auto-save enabled</label>
+                </div>
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span id="last-saved">Ready to save</span>
+                </div>
+            </div>
+            
+            <div class="focus-banner hidden" id="focus-banner">
+                <h3 id="focus-title">Today's Focus Project</h3>
+                <p id="focus-context">Project context will appear here</p>
+            </div>
+        </div>
+
+        <div class="priorities-section hidden" id="priorities-section">
+            <div class="priorities-header">
+                <div class="icon">⭐</div>
+                <h3>Today's Priorities</h3>
+            </div>
+            <div id="priorities-list"></div>
+        </div>
+
+        <div class="projects-grid" id="projects-container">
+            <!-- Projects will be rendered here -->
+        </div>
+        
+        <!-- Add Project Modal -->
+        <div class="modal-overlay hidden" id="add-project-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Add New Project</h2>
+                    <button class="modal-close" id="close-modal">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="project-name">Project Name</label>
+                        <input type="text" id="project-name" class="form-input" placeholder="Enter project name">
+                    </div>
+                    <div class="form-group">
+                        <label for="project-client">Client</label>
+                        <input type="text" id="project-client" class="form-input" placeholder="Enter client name">
+                    </div>
+                    <div class="form-group">
+                        <label for="project-context">Context</label>
+                        <textarea id="project-context" class="form-textarea" placeholder="Describe the project context and goals"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="initial-tasks">Initial Tasks (optional)</label>
+                        <textarea id="initial-tasks" class="form-textarea" placeholder="Enter initial tasks, one per line"></textarea>
+                        <small style="color: #6b7280; font-size: 12px;">You can add tasks later, or enter them now separated by new lines</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="cancel-project">Cancel</button>
+                    <button class="btn btn-primary" id="create-project">Create Project</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Focus Change Modal -->
+        <div class="modal-overlay hidden" id="focus-change-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Change Today's Focus</h2>
+                    <button class="modal-close" id="close-focus-modal">×</button>
+                </div>
+                <div class="modal-body">
+                    <p style="color: #6b7280; margin-bottom: 16px;">Select which project you want to focus on today:</p>
+                    <div class="focus-options" id="focus-options">
+                        <!-- Focus options will be rendered here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="cancel-focus">Cancel</button>
+                    <button class="btn btn-primary" id="confirm-focus">Set Focus</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Task Manager Implementation for Electron
+        class TaskManager {
+            constructor() {
+                this.projects = [];
+                this.focusProject = null;
+                this.dailyPriorities = [];
+                this.showFocusMode = false;
+                this.autoSaveEnabled = true;
+                this.editingTask = null;
+                this.newTaskProject = '';
+                this.newTaskText = '';
+                
+                // Check if running in Electron
+                this.isElectron = window.electronAPI && window.electronAPI.isElectron;
+                
+                // Use platform-appropriate paths
+                if (this.isElectron) {
+                    this.basePath = window.electronAPI.platform === 'win32' 
+                        ? 'C:\\Users\\' + (process.env.USERNAME || 'User') + '\\Documents\\MCP\\to-do'
+                        : '/Users/rachelstubbs/Documents/MCP/to-do';
+                } else {
+                    // Fallback for non-Electron environments
+                    this.basePath = '/Users/rachelstubbs/Documents/MCP/to-do';
+                }
+                
+                this.initializeProjects();
+                this.setupEventListeners();
+                
+                // Only setup menu handlers if in Electron
+                if (this.isElectron) {
+                    this.setupMenuHandlers();
+                }
+                
+                this.render();
+                this.setupAutoSave();
+                
+                // Only load existing data if in Electron
+                if (this.isElectron) {
+                    this.loadExistingData();
+                }
+            }
+            
+            initializeProjects() {
+                this.projects = [
+                    {
+                        id: 1,
+                        name: "Social Intelligence Dashboard - Merge Project",
+                        client: "BMW Motorrad",
+                        context: "Find a way to merge the existing Segment Level Dashboards and Product/Model Level dashboards into one project without over complicating and over delivering",
+                        tasks: [
+                            { id: 1, text: "Collect main points from mine and Katie's conversation about having a segment level throughout the full year for all segments, and add a product level section for relevant segments for certain models dependent on SOC's, Launches and priorities.", completed: false },
+                            { id: 2, text: "Complete Product Development process for this product to gather user stories, functional spec etc.", completed: false },
+                            { id: 3, text: "Create final presentation explaining what, why, how.", completed: false }
+                        ]
+                    },
+                    {
+                        id: 2,
+                        name: "Social Intelligence Dashboard - R 12 G/S Insights",
+                        client: "BMW Motorrad",
+                        context: "Complete the R 12 G/S consumer insights tab for France and Italy.",
+                        tasks: [
+                            { id: 1, text: "Improve the AI Insight Generation by adjusting model in prompt to o3", completed: false },
+                            { id: 2, text: "Share with wider team and client", completed: false }
+                        ]
+                    },
+                    {
+                        id: 3,
+                        name: "Social Intelligence Dashboard - Process Finessing",
+                        client: "BMW Motorrad",
+                        context: "Finesse the process for the newly merged Dashboard with segment and product levels",
+                        tasks: [
+                            { id: 1, text: "Define the Deep Research Prompts", completed: false },
+                            { id: 2, text: "Define the markdown templates for dashboard integration", completed: false },
+                            { id: 3, text: "Define layout and functionality of the dashboard.", completed: false },
+                            { id: 4, text: "Create final output for process and document", completed: false },
+                            { id: 5, text: "Create prototype version for Adventure segment /R 12 G/S model for France and Italy (using the data and dashboards we already have + adding the product level - attribute resonance and competitor analysis sections.", completed: false }
+                        ]
+                    },
+                    {
+                        id: 4,
+                        name: "Retailer Toolkit",
+                        client: "BMW Motorrad",
+                        context: "Find a solution to why some users can log in and others cant",
+                        tasks: [
+                            { id: 1, text: "Create main-backup branch", completed: false },
+                            { id: 2, text: "Remove all added security to Login functionality via Codex.", completed: false },
+                            { id: 3, text: "Test with user who can't currently log in", completed: false }
+                        ]
+                    },
+                    {
+                        id: 5,
+                        name: "Knowledge Base",
+                        client: "Zeno",
+                        context: "Tasked with creating a user functionality for the Knowledge Base in order to have users with different level of access",
+                        tasks: [
+                            { id: 1, text: "Get access to Github repo", completed: false },
+                            { id: 2, text: "Set-up test branch", completed: false },
+                            { id: 3, text: "Set up Supabase Pro account with registrations@", completed: false },
+                            { id: 4, text: "Update Supabase MCP in Cursor with new personal token key.", completed: false },
+                            { id: 5, text: "Create new database for users (view only, standard, admin)", completed: false }
+                        ]
+                    },
+                    {
+                        id: 6,
+                        name: "Admin",
+                        client: "Internal",
+                        context: "Administrative tasks and general business operations",
+                        tasks: [
+                            { id: 1, text: "Send Harriet Receipts", completed: false },
+                            { id: 2, text: "Update AI Tool Sheet", completed: false }
+                        ]
+                    },
+                    {
+                        id: 7,
+                        name: "Personal & Life",
+                        client: "Personal",
+                        context: "Personal tasks, life admin, and self-care activities",
+                        tasks: [
+                            { id: 1, text: "Schedule annual health check-up", completed: false },
+                            { id: 2, text: "Organize home office space", completed: false }
+                        ]
+                    }
+                ];
+                
+                this.focusProject = 5; // Set Zeno project as focus
+            }
+            
+            setupMenuHandlers() {
+                // Only set up menu handlers if electronAPI is available
+                if (!this.isElectron) return;
+                
+                // Listen for menu events from main process
+                window.electronAPI.onMenuNewProject(() => {
+                    this.showAddProjectModal();
+                });
+                
+                window.electronAPI.onMenuSaveAll(() => {
+                    this.saveAllFiles();
+                });
+                
+                window.electronAPI.onMenuToggleFocus(() => {
+                    this.showFocusMode = !this.showFocusMode;
+                    this.render();
+                });
+                
+                window.electronAPI.onExportData(async (event, filePath) => {
+                    await this.exportAllData(filePath);
+                });
+            }
+            
+            setupEventListeners() {
+                document.getElementById('focus-select').addEventListener('change', (e) => {
+                    if (e.target.value) {
+                        this.showFocusChangeModal(parseInt(e.target.value));
+                    } else {
+                        this.focusProject = null;
+                        this.render();
+                        this.triggerAutoSave();
+                    }
+                });
+                
+                document.getElementById('focus-mode-btn').addEventListener('click', () => {
+                    this.showFocusMode = !this.showFocusMode;
+                    this.render();
+                });
+                
+                document.getElementById('save-btn').addEventListener('click', () => {
+                    this.saveAllFiles();
+                });
+                
+                document.getElementById('auto-save').addEventListener('change', (e) => {
+                    this.autoSaveEnabled = e.target.checked;
+                });
+                
+                document.getElementById('add-project-btn').addEventListener('click', () => {
+                    this.showAddProjectModal();
+                });
+                
+                // Modal event listeners
+                document.getElementById('close-modal').addEventListener('click', () => {
+                    this.hideAddProjectModal();
+                });
+                
+                document.getElementById('cancel-project').addEventListener('click', () => {
+                    this.hideAddProjectModal();
+                });
+                
+                document.getElementById('create-project').addEventListener('click', () => {
+                    this.createNewProject();
+                });
+                
+                document.getElementById('close-focus-modal').addEventListener('click', () => {
+                    this.hideFocusChangeModal();
+                });
+                
+                document.getElementById('cancel-focus').addEventListener('click', () => {
+                    this.hideFocusChangeModal();
+                });
+                
+                document.getElementById('confirm-focus').addEventListener('click', () => {
+                    this.confirmFocusChange();
+                });
+                
+                // Close modals when clicking outside
+                document.getElementById('add-project-modal').addEventListener('click', (e) => {
+                    if (e.target.id === 'add-project-modal') {
+                        this.hideAddProjectModal();
+                    }
+                });
+                
+                document.getElementById('focus-change-modal').addEventListener('click', (e) => {
+                    if (e.target.id === 'focus-change-modal') {
+                        this.hideFocusChangeModal();
+                    }
+                });
+                
+                // Add escape key handler for modals
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        this.closeAllModals();
+                    }
+                });
+            }
+            
+            setupAutoSave() {
+                setInterval(() => {
+                    if (this.autoSaveEnabled) {
+                        this.triggerAutoSave();
+                    }
+                }, 3000); // Auto-save every 3 seconds
+            }
+            
+            async triggerAutoSave() {
+                try {
+                    document.getElementById('last-saved').textContent = '💾 Saving...';
+                    
+                    if (this.isElectron) {
+                        await this.saveAllFiles(true); // Silent save in Electron
+                    } else {
+                        // Fallback for non-Electron (just update status)
+                        const timestamp = new Date().toLocaleTimeString();
+                        document.getElementById('last-saved').innerHTML = `<div class="status-dot"></div>Ready to save - ${timestamp}`;
+                    }
+                } catch (error) {
+                    console.error('Auto-save failed:', error);
+                }
+            }
+            
+            async loadExistingData() {
+                // Only try to load data if in Electron
+                if (!this.isElectron) return;
+                
+                try {
+                    const dataPath = `${this.basePath}/task-manager-data.json`;
+                    const result = await window.electronAPI.readFile(dataPath);
+                    
+                    if (result.success) {
+                        const data = JSON.parse(result.content);
+                        this.projects = data.projects || this.projects;
+                        this.focusProject = data.focusProject || this.focusProject;
+                        this.dailyPriorities = data.dailyPriorities || this.dailyPriorities;
+                        this.render();
+                        
+                        this.showToast('✅ Loaded existing data!', 'success');
+                    }
+                } catch (error) {
+                    console.log('No existing data found, using defaults');
+                }
+            }
+            
+            async saveDataFile() {
+                // Only save data file if in Electron
+                if (!this.isElectron) return;
+                
+                const data = {
+                    projects: this.projects,
+                    focusProject: this.focusProject,
+                    dailyPriorities: this.dailyPriorities,
+                    lastSaved: new Date().toISOString()
+                };
+                
+                const dataPath = `${this.basePath}/task-manager-data.json`;
+                await window.electronAPI.writeFile(dataPath, JSON.stringify(data, null, 2));
+            }
+            
+            render() {
+                this.renderDate();
+                this.renderFocusSelect();
+                this.renderFocusBanner();
+                this.renderPriorities();
+                this.renderProjects();
+            }
+            
+            renderDate() {
+                const date = new Date().toLocaleDateString('en-US', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+                document.getElementById('current-date').textContent = date;
+            }
+            
+            renderFocusSelect() {
+                const select = document.getElementById('focus-select');
+                select.innerHTML = '<option value="">Select focus project...</option>';
+                
+                this.projects.forEach(project => {
+                    const option = document.createElement('option');
+                    option.value = project.id;
+                    option.textContent = project.name;
+                    option.selected = project.id === this.focusProject;
+                    select.appendChild(option);
+                });
+            }
+            
+            renderFocusBanner() {
+                const banner = document.getElementById('focus-banner');
+                const focusedProject = this.projects.find(p => p.id === this.focusProject);
+                
+                if (focusedProject) {
+                    banner.classList.remove('hidden');
+                    document.getElementById('focus-title').textContent = `Today's Focus: ${focusedProject.name}`;
+                    document.getElementById('focus-context').textContent = focusedProject.context;
+                } else {
+                    banner.classList.add('hidden');
+                }
+            }
+            
+            renderPriorities() {
+                const section = document.getElementById('priorities-section');
+                const list = document.getElementById('priorities-list');
+                const priorityTasks = this.getPriorityTasks();
+                
+                if (priorityTasks.length > 0) {
+                    section.classList.remove('hidden');
+                    list.innerHTML = '';
+                    
+                    priorityTasks.forEach(task => {
+                        const item = document.createElement('div');
+                        item.className = 'priority-item';
+                        
+                        const checkbox = document.createElement('button');
+                        checkbox.className = `task-btn ${task.completed ? 'active' : ''}`;
+                        checkbox.innerHTML = task.completed ? '✅' : '⭕';
+                        checkbox.onclick = () => this.toggleTask(task.projectId, task.id);
+                        
+                        const text = document.createElement('span');
+                        text.className = `task-text ${task.completed ? 'completed' : ''}`;
+                        text.innerHTML = `<strong>${task.projectName}:</strong> ${task.text}`;
+                        
+                        item.appendChild(checkbox);
+                        item.appendChild(text);
+                        list.appendChild(item);
+                    });
+                } else {
+                    section.classList.add('hidden');
+                }
+            }
+            
+            renderProjects() {
+                const container = document.getElementById('projects-container');
+                container.innerHTML = '';
+                
+                const filteredProjects = this.showFocusMode && this.focusProject 
+                    ? this.projects.filter(p => p.id === this.focusProject)
+                    : this.projects;
+                
+                filteredProjects.forEach(project => {
+                    const projectCard = this.createProjectCard(project);
+                    container.appendChild(projectCard);
+                });
+            }
+            
+            createProjectCard(project) {
+                const isFocused = project.id === this.focusProject;
+                const completedTasks = project.tasks.filter(task => task.completed).length;
+                const totalTasks = project.tasks.length;
+                const completionPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+                
+                const card = document.createElement('div');
+                card.className = `project-card ${isFocused ? 'focused' : ''}`;
+                
+                card.innerHTML = `
+                    <div class="project-header">
+                        <div class="project-title-group">
+                            <div class="project-icon ${isFocused ? 'focused' : ''}">
+                                👤
+                            </div>
+                            <div>
+                                <h2 class="project-title">${project.name}</h2>
+                                <p class="project-client">${project.client}</p>
+                            </div>
+                            ${isFocused ? '<div class="focus-badge">🎯 Today\'s Focus</div>' : ''}
+                        </div>
+                        <div class="progress-group">
+                            <span class="progress-text">${completedTasks}/${totalTasks} completed</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill ${isFocused ? 'focused' : ''}" style="width: ${completionPercentage}%"></div>
+                            </div>
+                            <span class="progress-percentage">${completionPercentage}%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="project-context ${isFocused ? 'focused' : ''}">
+                        <p class="context-text">
+                            <span class="context-label">Context:</span> ${project.context}
+                        </p>
+                    </div>
+                    
+                    <div class="tasks-list" id="tasks-${project.id}">
+                        <!-- Tasks will be rendered here -->
+                    </div>
+                `;
+                
+                this.renderTasks(project, card.querySelector(`#tasks-${project.id}`));
+                
+                return card;
+            }
+            
+            renderTasks(project, container) {
+                container.innerHTML = '';
+                
+                project.tasks.forEach(task => {
+                    const taskItem = this.createTaskItem(project, task);
+                    container.appendChild(taskItem);
+                });
+                
+                // Add new task input
+                const addTask = document.createElement('div');
+                addTask.className = 'add-task';
+                addTask.innerHTML = `
+                    <span style="color: #9ca3af;">➕</span>
+                    <input type="text" class="add-input" placeholder="Add new task..." id="new-task-${project.id}">
+                    <button class="add-btn hidden" id="add-btn-${project.id}">Add</button>
+                `;
+                
+                const input = addTask.querySelector(`#new-task-${project.id}`);
+                const btn = addTask.querySelector(`#add-btn-${project.id}`);
+                
+                input.addEventListener('input', (e) => {
+                    btn.classList.toggle('hidden', !e.target.value.trim());
+                });
+                
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && e.target.value.trim()) {
+                        this.addTask(project.id, e.target.value.trim());
+                        e.target.value = '';
+                        btn.classList.add('hidden');
+                    }
+                });
+                
+                btn.addEventListener('click', () => {
+                    if (input.value.trim()) {
+                        this.addTask(project.id, input.value.trim());
+                        input.value = '';
+                        btn.classList.add('hidden');
+                    }
+                });
+                
+                container.appendChild(addTask);
+            }
+            
+            createTaskItem(project, task) {
+                const isPriority = this.dailyPriorities.includes(`${project.id}-${task.id}`);
+                
+                const item = document.createElement('div');
+                item.className = `task-item ${task.completed ? 'completed' : ''} ${isPriority ? 'priority' : ''}`;
+                
+                const checkbox = document.createElement('button');
+                checkbox.className = `task-btn ${task.completed ? 'active' : ''}`;
+                checkbox.innerHTML = task.completed ? '✅' : '⭕';
+                checkbox.onclick = () => this.toggleTask(project.id, task.id);
+                
+                const priorityBtn = document.createElement('button');
+                priorityBtn.className = `task-btn ${isPriority ? 'priority' : ''}`;
+                priorityBtn.innerHTML = isPriority ? '⭐' : '☆';
+                priorityBtn.title = isPriority ? 'Remove from daily priorities' : 'Add to daily priorities';
+                priorityBtn.onclick = () => this.togglePriority(project.id, task.id);
+                
+                const text = document.createElement('span');
+                text.className = `task-text ${task.completed ? 'completed' : ''}`;
+                text.textContent = task.text;
+                
+                const editBtn = document.createElement('button');
+                editBtn.className = 'task-btn';
+                editBtn.innerHTML = '✏️';
+                editBtn.onclick = () => this.editTask(project.id, task.id, text);
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'task-btn';
+                deleteBtn.innerHTML = '🗑️';
+                deleteBtn.onclick = () => this.deleteTask(project.id, task.id);
+                
+                const actions = document.createElement('div');
+                actions.className = 'task-actions';
+                actions.appendChild(editBtn);
+                actions.appendChild(deleteBtn);
+                
+                item.appendChild(checkbox);
+                item.appendChild(priorityBtn);
+                item.appendChild(text);
+                item.appendChild(actions);
+                
+                return item;
+            }
+            
+            toggleTask(projectId, taskId) {
+                const project = this.projects.find(p => p.id === projectId);
+                const task = project.tasks.find(t => t.id === taskId);
+                task.completed = !task.completed;
+                this.render();
+                this.triggerAutoSave();
+            }
+            
+            togglePriority(projectId, taskId) {
+                const priorityKey = `${projectId}-${taskId}`;
+                const index = this.dailyPriorities.indexOf(priorityKey);
+                
+                if (index > -1) {
+                    this.dailyPriorities.splice(index, 1);
+                } else {
+                    this.dailyPriorities.push(priorityKey);
+                }
+                
+                this.render();
+                this.triggerAutoSave();
+            }
+            
+            addTask(projectId, text) {
+                const project = this.projects.find(p => p.id === projectId);
+                const newTask = {
+                    id: Math.max(...project.tasks.map(t => t.id), 0) + 1,
+                    text: text,
+                    completed: false
+                };
+                project.tasks.push(newTask);
+                this.render();
+                this.triggerAutoSave();
+            }
+            
+            editTask(projectId, taskId, textElement) {
+                const project = this.projects.find(p => p.id === projectId);
+                const task = project.tasks.find(t => t.id === taskId);
+                
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'task-input';
+                input.value = task.text;
+                input.onblur = () => {
+                    task.text = input.value || task.text;
+                    this.render();
+                    this.triggerAutoSave();
+                };
+                input.onkeypress = (e) => {
+                    if (e.key === 'Enter') {
+                        task.text = input.value || task.text;
+                        this.render();
+                        this.triggerAutoSave();
+                    }
+                };
+                
+                textElement.parentNode.replaceChild(input, textElement);
+                input.focus();
+            }
+            
+            deleteTask(projectId, taskId) {
+                const project = this.projects.find(p => p.id === projectId);
+                project.tasks = project.tasks.filter(t => t.id !== taskId);
+                // Remove from priorities if it was there
+                const priorityKey = `${projectId}-${taskId}`;
+                const index = this.dailyPriorities.indexOf(priorityKey);
+                if (index > -1) {
+                    this.dailyPriorities.splice(index, 1);
+                }
+                this.render();
+                this.triggerAutoSave();
+            }
+            
+            getPriorityTasks() {
+                const tasks = [];
+                this.projects.forEach(project => {
+                    project.tasks.forEach(task => {
+                        if (this.dailyPriorities.includes(`${project.id}-${task.id}`)) {
+                            tasks.push({ ...task, projectName: project.name, projectId: project.id });
+                        }
+                    });
+                });
+                return tasks;
+            }
+            
+            generateMarkdownForProject(project) {
+                const completedTasks = project.tasks.filter(task => task.completed).length;
+                const totalTasks = project.tasks.length;
+                const date = new Date().toLocaleDateString();
+                
+                let markdown = `# Project ${project.id}: ${project.name}\n\n`;
+                markdown += `**Date:** ${date}\n`;
+                markdown += `**Client:** ${project.client}\n`;
+                markdown += `**Context:** ${project.context}\n\n`;
+                markdown += `## Tasks\n\n`;
+                
+                project.tasks.forEach((task, index) => {
+                    const checkbox = task.completed ? '[x]' : '[ ]';
+                    const isPriority = this.dailyPriorities.includes(`${project.id}-${task.id}`);
+                    const priorityMark = isPriority ? ' ⭐' : '';
+                    
+                    markdown += `### Task ${index + 1}\n`;
+                    markdown += `- ${checkbox} ${task.text}${priorityMark}\n`;
+                    if (task.completed) {
+                        markdown += `- ✅ Completed\n`;
+                    }
+                    markdown += `\n`;
+                });
+                
+                markdown += `## Progress\n`;
+                markdown += `- Total Tasks: ${totalTasks}\n`;
+                markdown += `- Completed: ${completedTasks}\n`;
+                markdown += `- Remaining: ${totalTasks - completedTasks}\n`;
+                markdown += `- Progress: ${totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0}%\n\n`;
+                
+                if (project.id === this.focusProject) {
+                    markdown += `## Today's Focus\n`;
+                    markdown += `🎯 This project is set as today's focus!\n\n`;
+                }
+                
+                markdown += `## Notes\n`;
+                markdown += `_Last updated: ${date}_\n`;
+                markdown += `_Add any additional notes or updates here as you progress_\n`;
+                
+                return markdown;
+            }
+            
+            async saveAllFiles(silent = false) {
+                try {
+                    if (!silent) {
+                        document.getElementById('last-saved').textContent = '💾 Saving...';
+                    }
+                    
+                    if (this.isElectron) {
+                        // Save individual project files in Electron
+                        for (const project of this.projects) {
+                            const folderName = `Project-${project.id}-${project.name.replace(/[^a-zA-Z0-9]/g, '-')}`;
+                            const content = this.generateMarkdownForProject(project);
+                            const filePath = `${this.basePath}/${folderName}/tasks.md`;
+                            
+                            // Ensure directory exists
+                            await window.electronAPI.ensureDirectory(`${this.basePath}/${folderName}`);
+                            
+                            // Write the file
+                            const result = await window.electronAPI.writeFile(filePath, content);
+                            if (!result.success) {
+                                throw new Error(result.error);
+                            }
+                        }
+                        
+                        // Save the main data file
+                        await this.saveDataFile();
+                        
+                        const timestamp = new Date().toLocaleTimeString();
+                        document.getElementById('last-saved').innerHTML = `<div class="status-dot"></div>Last saved: ${timestamp}`;
+                        
+                        if (!silent) {
+                            this.showToast('✅ All files saved successfully!', 'success');
+                        }
+                    } else {
+                        // Fallback for non-Electron environments
+                        this.showExportModal();
+                        document.getElementById('last-saved').innerHTML = '📋 Export ready';
+                    }
+                } catch (error) {
+                    console.error('Save failed:', error);
+                    document.getElementById('last-saved').textContent = '❌ Save failed';
+                    if (!silent) {
+                        this.showToast('❌ Save failed: ' + error.message, 'error');
+                    }
+                }
+            }
+            
+            async exportAllData(filePath) {
+                // Only available in Electron
+                if (!this.isElectron) return;
+                
+                try {
+                    const exportData = {
+                        projects: this.projects,
+                        focusProject: this.focusProject,
+                        dailyPriorities: this.dailyPriorities,
+                        exportDate: new Date().toISOString(),
+                        version: '1.0.0'
+                    };
+                    
+                    const result = await window.electronAPI.writeFile(filePath, JSON.stringify(exportData, null, 2));
+                    
+                    if (result.success) {
+                        this.showToast('✅ Data exported successfully!', 'success');
+                    } else {
+                        throw new Error(result.error);
+                    }
+                } catch (error) {
+                    console.error('Export failed:', error);
+                    this.showToast('❌ Export failed: ' + error.message, 'error');
+                }
+            }
+            
+            showExportModal() {
+                // Fallback export modal for non-Electron environments
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(0, 0, 0, 0.5);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 1000;
+                `;
+                
+                const content = document.createElement('div');
+                content.style.cssText = `
+                    background: white;
+                    padding: 24px;
+                    border-radius: 12px;
+                    max-width: 500px;
+                    width: 90%;
+                    max-height: 80vh;
+                    overflow-y: auto;
+                `;
+                
+                let html = '<h2 style="margin-bottom: 16px;">Export Files</h2>';
+                html += '<p style="margin-bottom: 16px; color: #666;">Copy the content below and paste it into your existing task files:</p>';
+                
+                this.projects.forEach(project => {
+                    const folderName = `Project-${project.id}-${project.name.replace(/[^a-zA-Z0-9]/g, '-')}`;
+                    const markdown = this.generateMarkdownForProject(project);
+                    
+                    html += `
+                        <div style="margin-bottom: 16px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+                            <div style="background: #f3f4f6; padding: 8px 12px; font-weight: 500; display: flex; justify-content: space-between; align-items: center;">
+                                <span>${folderName}/tasks.md</span>
+                                <button onclick="navigator.clipboard.writeText(this.parentNode.nextElementSibling.textContent); this.textContent='Copied!'; setTimeout(() => this.textContent='Copy', 1000)" style="background: #3b82f6; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer;">Copy</button>
+                            </div>
+                            <pre style="background: #f9fafb; padding: 12px; margin: 0; overflow-x: auto; font-size: 12px; max-height: 200px; overflow-y: auto;">${markdown}</pre>
+                        </div>
+                    `;
+                });
+                
+                html += '<button onclick="this.closest(\'[style*=fixed]\').remove()" style="background: #6b7280; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">Close</button>';
+                
+                content.innerHTML = html;
+                modal.appendChild(content);
+                document.body.appendChild(modal);
+                
+                modal.onclick = (e) => {
+                    if (e.target === modal) {
+                        modal.remove();
+                    }
+                };
+            }
+            
+            showToast(message, type = 'success') {
+                const toast = document.createElement('div');
+                toast.className = 'success-toast';
+                if (type === 'error') {
+                    toast.style.background = '#ef4444';
+                }
+                toast.innerHTML = message;
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.remove();
+                }, 3000);
+            }
+            
+            // Modal Functions
+            showAddProjectModal() {
+                this.closeAllModals();
+                document.getElementById('add-project-modal').classList.remove('hidden');
+                document.getElementById('project-name').focus();
+            }
+            
+            hideAddProjectModal() {
+                document.getElementById('add-project-modal').classList.add('hidden');
+                this.clearProjectForm();
+            }
+            
+            clearProjectForm() {
+                document.getElementById('project-name').value = '';
+                document.getElementById('project-client').value = '';
+                document.getElementById('project-context').value = '';
+                document.getElementById('initial-tasks').value = '';
+            }
+            
+            createNewProject() {
+                const name = document.getElementById('project-name').value.trim();
+                const client = document.getElementById('project-client').value.trim();
+                const context = document.getElementById('project-context').value.trim();
+                const initialTasks = document.getElementById('initial-tasks').value.trim();
+                
+                if (!name || !client || !context) {
+                    this.showToast('❌ Please fill in all required fields (Name, Client, Context)', 'error');
+                    return;
+                }
+                
+                const newProject = {
+                    id: Math.max(...this.projects.map(p => p.id), 0) + 1,
+                    name: name,
+                    client: client,
+                    context: context,
+                    tasks: []
+                };
+                
+                // Add initial tasks if provided
+                if (initialTasks) {
+                    const taskLines = initialTasks.split('\n').filter(line => line.trim());
+                    taskLines.forEach((taskText, index) => {
+                        newProject.tasks.push({
+                            id: index + 1,
+                            text: taskText.trim(),
+                            completed: false
+                        });
+                    });
+                }
+                
+                this.projects.push(newProject);
+                this.hideAddProjectModal();
+                this.render();
+                this.triggerAutoSave();
+                
+                this.showToast(`✅ Project "${name}" has been created!`, 'success');
+            }
+            
+            showFocusChangeModal(projectId) {
+                this.closeAllModals();
+                this.selectedFocusProject = projectId;
+                document.getElementById('focus-change-modal').classList.remove('hidden');
+                this.renderFocusOptions();
+            }
+            
+            hideFocusChangeModal() {
+                document.getElementById('focus-change-modal').classList.add('hidden');
+                this.selectedFocusProject = null;
+                document.getElementById('focus-select').value = this.focusProject || '';
+            }
+            
+            renderFocusOptions() {
+                const container = document.getElementById('focus-options');
+                container.innerHTML = '';
+                
+                // Add "No Focus" option
+                const noFocusOption = document.createElement('div');
+                noFocusOption.className = 'focus-option';
+                noFocusOption.innerHTML = `
+                    <input type="radio" name="focus-option" value="" ${!this.selectedFocusProject ? 'checked' : ''}>
+                    <div class="focus-option-content">
+                        <div class="focus-option-title">No Focus</div>
+                        <div class="focus-option-client">Work on all projects equally</div>
+                    </div>
+                `;
+                noFocusOption.addEventListener('click', () => {
+                    this.selectedFocusProject = null;
+                    this.updateFocusSelection();
+                });
+                container.appendChild(noFocusOption);
+                
+                // Add project options
+                this.projects.forEach(project => {
+                    const option = document.createElement('div');
+                    option.className = `focus-option ${this.selectedFocusProject === project.id ? 'selected' : ''}`;
+                    option.innerHTML = `
+                        <input type="radio" name="focus-option" value="${project.id}" ${this.selectedFocusProject === project.id ? 'checked' : ''}>
+                        <div class="focus-option-content">
+                            <div class="focus-option-title">${project.name}</div>
+                            <div class="focus-option-client">${project.client}</div>
+                        </div>
+                    `;
+                    option.addEventListener('click', () => {
+                        this.selectedFocusProject = project.id;
+                        this.updateFocusSelection();
+                    });
+                    container.appendChild(option);
+                });
+            }
+            
+            updateFocusSelection() {
+                document.querySelectorAll('input[name="focus-option"]').forEach(radio => {
+                    radio.checked = radio.value == (this.selectedFocusProject || '');
+                });
+                
+                document.querySelectorAll('.focus-option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+                
+                if (this.selectedFocusProject) {
+                    document.querySelector(`input[value="${this.selectedFocusProject}"]`).closest('.focus-option').classList.add('selected');
+                } else {
+                    document.querySelector('input[value=""]').closest('.focus-option').classList.add('selected');
+                }
+            }
+            
+            confirmFocusChange() {
+                this.focusProject = this.selectedFocusProject;
+                this.hideFocusChangeModal();
+                this.render();
+                this.triggerAutoSave();
+                
+                if (this.focusProject) {
+                    const focusedProject = this.projects.find(p => p.id === this.focusProject);
+                    this.showToast(`🎯 Now focusing on: ${focusedProject.name}`, 'success');
+                } else {
+                    this.showToast('🎯 Focus cleared - working on all projects equally', 'success');
+                }
+            }
+            
+            closeAllModals() {
+                document.getElementById('add-project-modal').classList.add('hidden');
+                document.getElementById('focus-change-modal').classList.add('hidden');
+                this.clearProjectForm();
+                this.selectedFocusProject = null;
+                document.getElementById('focus-select').value = this.focusProject || '';
+            }
+        }
+        
+        // Initialize the app when DOM is loaded
+        window.addEventListener('DOMContentLoaded', () => {
+            new TaskManager();
+        });
+    </script>
+</body>
+</html>
