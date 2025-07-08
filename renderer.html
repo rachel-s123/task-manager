@@ -634,6 +634,24 @@
             color: #fff;
             border-color: #0700ff;
         }
+
+        .task-search {
+            margin-left: auto;
+        }
+
+        .task-search-input {
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 14px;
+            font-family: 'Archivo', Arial, sans-serif;
+        }
+
+        .task-search-input:focus {
+            outline: none;
+            border-color: #0700ff;
+            box-shadow: 0 0 0 2px #e2fc0b44;
+        }
         
         .detailed-task-item {
             background: #f8fafc;
@@ -2566,6 +2584,9 @@
                 this.selectedNoteColor = 'yellow';
                 this.notesFilter = 'all';
                 this.notesSearch = '';
+
+                // Task search
+                this.taskSearch = '';
                 
                 // View filtering and sorting
                 this.viewSearch = '';
@@ -3790,6 +3811,9 @@
                                     <button class="task-filter-btn ${this.taskFilter === 'active' ? 'active' : ''}" onclick="window.taskManager.setTaskFilter('active')">Active</button>
                                     <button class="task-filter-btn ${this.taskFilter === 'completed' ? 'active' : ''}" onclick="window.taskManager.setTaskFilter('completed')">Completed</button>
                                 </div>
+                                <div class="task-search">
+                                    <input type="text" class="task-search-input" id="task-search-input" placeholder="Search tasks..." oninput="window.taskManager.setTaskSearch(this.value)">
+                                </div>
                             </div>
                             <div id="detailed-tasks-list">
                                 ${this.renderDetailedTasks(project)}
@@ -3801,19 +3825,29 @@
             
             renderDetailedTasks(project) {
                 let tasks = project.tasks;
-                
+
                 // Apply filter
                 if (this.taskFilter === 'active') {
                     tasks = tasks.filter(task => !task.completed);
                 } else if (this.taskFilter === 'completed') {
                     tasks = tasks.filter(task => task.completed);
                 }
+
+                // Apply search
+                if (this.taskSearch) {
+                    const search = this.taskSearch.toLowerCase();
+                    tasks = tasks.filter(task =>
+                        task.text.toLowerCase().includes(search) ||
+                        (task.tags && task.tags.some(tag => tag.toLowerCase().includes(search)))
+                    );
+                }
                 
                 if (tasks.length === 0) {
+                    const filterText = this.taskFilter === 'all' ? '' : this.taskFilter + ' ';
                     return `
                         <div style="text-align: center; padding: 40px; color: #9ca3af;">
                             <div style="font-size: 48px; margin-bottom: 16px;">📝</div>
-                            <p>No ${this.taskFilter === 'all' ? '' : this.taskFilter} tasks found</p>
+                            <p>No ${filterText}tasks found${this.taskSearch ? ' for "' + this.taskSearch + '"' : ''}</p>
                         </div>
                     `;
                 }
@@ -3985,6 +4019,11 @@
             // TASK MANAGEMENT METHODS
             setTaskFilter(filter) {
                 this.taskFilter = filter;
+                this.renderProjectDetail();
+            }
+
+            setTaskSearch(query) {
+                this.taskSearch = query;
                 this.renderProjectDetail();
             }
             

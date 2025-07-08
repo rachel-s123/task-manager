@@ -39,6 +39,6 @@ This file lists development tasks to ensure the application supports core featur
 - [x] Provide a visible indicator that focus mode is active.
 
 ## Search & Export
-- [ ] Add search functionality for tasks similar to project and note search.
+- [x] Add search functionality for tasks similar to project and note search.
 - [x] Implement the `exportAllData` method to write all user data to a chosen file.
 - [x] Remove unused HTML files (`renderer-backup.html` and `task-manager-phase4.html`) once all features are merged.
