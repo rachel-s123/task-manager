@@ -5,6 +5,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   writeFile: (filePath, content) => ipcRenderer.invoke('write-file', filePath, content),
   readFile: (filePath) => ipcRenderer.invoke('read-file', filePath),
   ensureDirectory: (dirPath) => ipcRenderer.invoke('ensure-directory', dirPath),
+  getUserDataPath: () => ipcRenderer.invoke('get-user-data-path'),
   
   // Dialog operations
   showSaveDialog: () => ipcRenderer.invoke('show-save-dialog'),
@@ -17,5 +18,4 @@ contextBridge.exposeInMainWorld('electronAPI', {
   
   // App info
   platform: process.platform,
-  isElectron: true
-});
+  isElectron: true});

@@ -26,3 +26,19 @@ This file lists development tasks to ensure the application supports core featur
 - [ ] Notes can be linked to a project or standalone.
 - [ ] Provide an easy-to-see blank block in the top-right corner where floating notes can be placed.
 - [ ] When a note is linked to a project, clicking it should navigate to that project's details.
+
+## Persistence & Data Storage
+- [x] Persist projects, tasks and notes to disk as JSON files.
+- [x] Load existing data on start from the application's userData directory.
+- [x] Save the positions and colors of floating notes.
+- [x] Replace the hard-coded `basePath` with `app.getPath('userData')` to work cross-platform.
+
+## Focus Mode and Navigation
+- [x] Implement a menu action to toggle focus mode in `renderer.html`.
+- [x] When focus mode is enabled, hide all projects except the selected focus project.
+- [x] Provide a visible indicator that focus mode is active.
+
+## Search & Export
+- [ ] Add search functionality for tasks similar to project and note search.
+- [x] Implement the `exportAllData` method to write all user data to a chosen file.
+- [x] Remove unused HTML files (`renderer-backup.html` and `task-manager-phase4.html`) once all features are merged.
