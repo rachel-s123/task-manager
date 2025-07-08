@@ -138,6 +138,9 @@ function createMenu() {
 }
 
 // IPC Handlers for file operations
+ipcMain.handle('get-user-data-path', () => {
+  return app.getPath('userData');
+});
 ipcMain.handle('write-file', async (event, filePath, content) => {
   try {
     // Ensure directory exists

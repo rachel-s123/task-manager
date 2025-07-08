@@ -2222,6 +2222,11 @@
                 </div>
             </div>
 
+            <div class="focus-banner hidden" id="focus-banner">
+                <h3 id="focus-title">Today's Focus Project</h3>
+                <p id="focus-context">Project context will appear here</p>
+            </div>
+
             <!-- Recent Activity -->
             <div class="activity-feed">
                 <div class="activity-header">
@@ -2568,13 +2573,16 @@
                 
                 // Check if running in Electron
                 this.isElectron = window.electronAPI && window.electronAPI.isElectron;
-                
+
+                this.basePath = '';
                 if (this.isElectron) {
-                    this.basePath = window.electronAPI.platform === 'win32' 
-                        ? 'C:\\Users\\' + (process.env.USERNAME || 'User') + '\\Documents\\MCP\\to-do'
-                        : '/Users/rachelstubbs/Documents/MCP/to-do';
+                    window.electronAPI.getUserDataPath().then(p => {
+                        this.basePath = p;
+                        this.loadExistingData();
+                    });
+                    this.setupMenuHandlers();
                 } else {
-                    this.basePath = '/Users/rachelstubbs/Documents/MCP/to-do';
+                    this.basePath = '/tmp';
                 }
                 
                 this.initializeProjects();
@@ -2585,10 +2593,6 @@
                 
                 this.render();
                 this.setupAutoSave();
-                
-                if (this.isElectron) {
-                    this.loadExistingData();
-                }
             }
             
             initializeNotes() {
@@ -2947,6 +2951,27 @@
                 // Show keyboard shortcuts on first load
                 this.showToast('💡 Keyboard shortcuts: Ctrl+H (Home), Ctrl+N (New Project), Ctrl+F (Filters), Esc (Back)', 'info');
             }
+
+            setupMenuHandlers() {
+                if (!this.isElectron) return;
+
+                window.electronAPI.onMenuNewProject(() => {
+                    this.showAddProjectModal();
+                });
+
+                window.electronAPI.onMenuSaveAll(() => {
+                    this.saveAllFiles();
+                });
+
+                window.electronAPI.onMenuToggleFocus(() => {
+                    this.showFocusMode = !this.showFocusMode;
+                    this.render();
+                });
+
+                window.electronAPI.onExportData(async (event, filePath) => {
+                    await this.exportAllData(filePath);
+                });
+            }
             
             setupAutoSave() {
                 setInterval(() => {
@@ -2967,14 +2992,47 @@
             }
             
             async loadExistingData() {
-                // Simulation of loading data - in real app this would load from file
-                console.log('Loading existing data...');
+                if (!this.isElectron || !this.basePath) return;
+                try {
+                    const dataPath = `${this.basePath}/task-manager-data.json`;
+                    const result = await window.electronAPI.readFile(dataPath);
+                    if (result.success) {
+                        const data = JSON.parse(result.content);
+                        this.projects = data.projects || this.projects;
+                        this.notes = data.notes || this.notes;
+                        this.floatingNotes = data.floatingNotes || this.floatingNotes;
+                        this.focusProject = data.focusProject ?? this.focusProject;
+                        this.dailyPriorities = data.dailyPriorities || this.dailyPriorities;
+                        this.render();
+                        this.showToast('✅ Loaded existing data!', 'success');
+                    }
+                } catch (error) {
+                    console.log('No existing data found, using defaults');
+                }
             }
-            
+
             async saveAllFiles(silent = false) {
-                // Simulation of saving data - in real app this would save to files
-                if (!silent) {
-                    this.showToast('💾 Data saved successfully!', 'success');
+                if (!this.isElectron || !this.basePath) return;
+                try {
+                    const data = {
+                        projects: this.projects,
+                        notes: this.notes,
+                        floatingNotes: this.floatingNotes,
+                        focusProject: this.focusProject,
+                        dailyPriorities: this.dailyPriorities,
+                        lastSaved: new Date().toISOString()
+                    };
+                    const dataPath = `${this.basePath}/task-manager-data.json`;
+                    const result = await window.electronAPI.writeFile(dataPath, JSON.stringify(data, null, 2));
+                    if (!result.success) throw new Error(result.error);
+                    if (!silent) {
+                        this.showToast('💾 Data saved successfully!', 'success');
+                    }
+                } catch (error) {
+                    console.error('Save failed:', error);
+                    if (!silent) {
+                        this.showToast('❌ Save failed: ' + error.message, 'error');
+                    }
                 }
             }
             
@@ -3027,12 +3085,16 @@
                 // Apply search filter
                 if (this.viewSearch) {
                     const search = this.viewSearch.toLowerCase();
-                    projects = projects.filter(project => 
+                    projects = projects.filter(project =>
                         project.name.toLowerCase().includes(search) ||
                         project.client.toLowerCase().includes(search) ||
                         project.context.toLowerCase().includes(search) ||
                         (project.tags && project.tags.some(tag => tag.toLowerCase().includes(search)))
                     );
+                }
+
+                if (this.showFocusMode && this.focusProject) {
+                    projects = projects.filter(p => String(p.id) === String(this.focusProject));
                 }
                 
                 // Apply sorting
@@ -3076,7 +3138,8 @@
             render() {
                 this.renderDate();
                 this.renderBreadcrumb();
-                
+                this.renderFocusBanner();
+
                 if (this.currentView === 'dashboard') {
                     this.renderDashboard();
                 } else if (this.currentView === 'project-detail') {
@@ -3117,6 +3180,22 @@
                             <span class="breadcrumb-current">📂 ${project ? project.name : 'Project'}</span>
                         </div>
                     `;
+                }
+            }
+
+            renderFocusBanner() {
+                const banner = document.getElementById('focus-banner');
+                if (!banner) return;
+
+                if (this.showFocusMode && this.focusProject) {
+                    const focusedProject = this.projects.find(p => String(p.id) === String(this.focusProject));
+                    if (focusedProject) {
+                        banner.classList.remove('hidden');
+                        banner.querySelector('#focus-title').textContent = `Today's Focus: ${focusedProject.name}`;
+                        banner.querySelector('#focus-context').textContent = focusedProject.context || '';
+                    }
+                } else {
+                    banner.classList.add('hidden');
                 }
             }
             
@@ -4536,9 +4615,41 @@
             showDeadlineOverview() {
                 this.showToast('⏰ Deadline overview feature coming soon!', 'info');
             }
-            
-            exportAllData() {
-                this.showToast('📤 Export feature coming soon!', 'info');
+
+            async exportAllData(filePath) {
+                if (!this.isElectron) {
+                    this.showToast('📤 Export only available in Electron', 'info');
+                    return;
+                }
+
+                if (!filePath) {
+                    const result = await window.electronAPI.showSaveDialog();
+                    if (result.canceled) return;
+                    filePath = result.filePath;
+                }
+
+                try {
+                    const exportData = {
+                        projects: this.projects,
+                        notes: this.notes,
+                        floatingNotes: this.floatingNotes,
+                        focusProject: this.focusProject,
+                        dailyPriorities: this.dailyPriorities,
+                        exportDate: new Date().toISOString(),
+                        version: '1.0.0'
+                    };
+
+                    const result = await window.electronAPI.writeFile(filePath, JSON.stringify(exportData, null, 2));
+
+                    if (result.success) {
+                        this.showToast('✅ Data exported successfully!', 'success');
+                    } else {
+                        throw new Error(result.error);
+                    }
+                } catch (error) {
+                    console.error('Export failed:', error);
+                    this.showToast('❌ Export failed: ' + error.message, 'error');
+                }
             }
             
             toggleFilters() {
