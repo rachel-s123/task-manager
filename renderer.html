@@ -634,6 +634,24 @@
             color: #fff;
             border-color: #0700ff;
         }
+
+        .task-search {
+            margin-left: auto;
+        }
+
+        .task-search-input {
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 14px;
+            font-family: 'Archivo', Arial, sans-serif;
+        }
+
+        .task-search-input:focus {
+            outline: none;
+            border-color: #0700ff;
+            box-shadow: 0 0 0 2px #e2fc0b44;
+        }
         
         .detailed-task-item {
             background: #f8fafc;
@@ -2566,6 +2584,9 @@
                 this.selectedNoteColor = 'yellow';
                 this.notesFilter = 'all';
                 this.notesSearch = '';
+
+                // Task search
+                this.taskSearch = '';
                 
                 // View filtering and sorting
                 this.viewSearch = '';
@@ -3419,6 +3440,7 @@
                         <div class="list-item-actions">
                             <button class="btn btn-outline" style="padding: 6px 12px; font-size: 13px;" onclick="event.stopPropagation(); window.taskManager.showEditProjectModal('${project.id}')">✏️ Edit</button>
                             <button class="btn btn-primary" style="padding: 6px 12px; font-size: 13px;" onclick="event.stopPropagation(); window.taskManager.navigateToProject('${project.id}')">👁️ View</button>
+                            <button class="btn btn-warning" style="padding: 6px 12px; font-size: 13px;" onclick="event.stopPropagation(); window.taskManager.toggleFocusProject('${project.id}')">🎯</button>
                         </div>
                     </div>
                 `;
@@ -3549,7 +3571,7 @@
                 card.className = `kanban-card ${isFocused ? 'focused' : ''}`;
                 card.draggable = true;
                 card.dataset.projectId = project.id;
-                card.setAttribute('onclick', `window.taskManager.showEditTaskModal('${project.id}', '${project.tasks[0].id}')`);
+                card.onclick = () => this.navigateToProject(project.id);
                 
                 let deadlineHtml = '';
                 if (project.deadline) {
@@ -3690,6 +3712,7 @@
                             </div>
                             <span class="progress-percentage">${completionPercentage}%</span>
                         </div>
+                        <button class="btn btn-warning" style="padding:4px 8px;font-size:12px;" onclick="event.stopPropagation(); window.taskManager.toggleFocusProject('${project.id}')">🎯</button>
                     </div>
                     
                     <div class="project-context ${isFocused ? 'focused' : ''}">
@@ -3723,6 +3746,7 @@
                 let iconClass = 'project-detail-icon';
                 if (deadlineStatus === 'overdue') iconClass += ' overdue';
                 else if (deadlineStatus === 'due-soon') iconClass += ' due-soon';
+                const isFocusedProject = project.id === this.focusProject;
                 
                 container.innerHTML = `
                     <div class="project-detail">
@@ -3743,6 +3767,9 @@
                                 </button>
                                 <button class="btn btn-success" onclick="window.taskManager.saveAllFiles()">
                                     <span>💾</span> Save
+                                </button>
+                                <button class="btn btn-warning" onclick="window.taskManager.toggleFocusProject('${project.id}')">
+                                    <span>🎯</span> ${isFocusedProject ? 'Unfocus' : 'Set Focus'}
                                 </button>
                             </div>
                         </div>
@@ -3790,6 +3817,9 @@
                                     <button class="task-filter-btn ${this.taskFilter === 'active' ? 'active' : ''}" onclick="window.taskManager.setTaskFilter('active')">Active</button>
                                     <button class="task-filter-btn ${this.taskFilter === 'completed' ? 'active' : ''}" onclick="window.taskManager.setTaskFilter('completed')">Completed</button>
                                 </div>
+                                <div class="task-search">
+                                    <input type="text" class="task-search-input" id="task-search-input" placeholder="Search tasks..." oninput="window.taskManager.setTaskSearch(this.value)">
+                                </div>
                             </div>
                             <div id="detailed-tasks-list">
                                 ${this.renderDetailedTasks(project)}
@@ -3801,19 +3831,29 @@
             
             renderDetailedTasks(project) {
                 let tasks = project.tasks;
-                
+
                 // Apply filter
                 if (this.taskFilter === 'active') {
                     tasks = tasks.filter(task => !task.completed);
                 } else if (this.taskFilter === 'completed') {
                     tasks = tasks.filter(task => task.completed);
                 }
+
+                // Apply search
+                if (this.taskSearch) {
+                    const search = this.taskSearch.toLowerCase();
+                    tasks = tasks.filter(task =>
+                        task.text.toLowerCase().includes(search) ||
+                        (task.tags && task.tags.some(tag => tag.toLowerCase().includes(search)))
+                    );
+                }
                 
                 if (tasks.length === 0) {
+                    const filterText = this.taskFilter === 'all' ? '' : this.taskFilter + ' ';
                     return `
                         <div style="text-align: center; padding: 40px; color: #9ca3af;">
                             <div style="font-size: 48px; margin-bottom: 16px;">📝</div>
-                            <p>No ${this.taskFilter === 'all' ? '' : this.taskFilter} tasks found</p>
+                            <p>No ${filterText}tasks found${this.taskSearch ? ' for "' + this.taskSearch + '"' : ''}</p>
                         </div>
                     `;
                 }
@@ -3987,6 +4027,11 @@
                 this.taskFilter = filter;
                 this.renderProjectDetail();
             }
+
+            setTaskSearch(query) {
+                this.taskSearch = query;
+                this.renderProjectDetail();
+            }
             
             toggleTask(projectId, taskId) {
                 const project = this.projects.find(p => p.id === projectId);
@@ -4011,13 +4056,23 @@
             togglePriority(projectId, taskId) {
                 const priorityKey = `${projectId}-${taskId}`;
                 const index = this.dailyPriorities.indexOf(priorityKey);
-                
+
                 if (index > -1) {
                     this.dailyPriorities.splice(index, 1);
                 } else {
                     this.dailyPriorities.push(priorityKey);
                 }
-                
+
+                this.render();
+                this.triggerAutoSave();
+            }
+
+            toggleFocusProject(projectId) {
+                if (this.focusProject === projectId) {
+                    this.focusProject = null;
+                } else {
+                    this.focusProject = projectId;
+                }
                 this.render();
                 this.triggerAutoSave();
             }
@@ -4179,7 +4234,9 @@
                 }
                 
                 const tags = tagsText ? tagsText.split(',').map(tag => tag.trim()).filter(tag => tag) : [];
-                
+
+                const oldDeadline = project.deadline;
+
                 // Update project
                 project.name = name;
                 project.client = client;
@@ -4187,6 +4244,13 @@
                 project.deadline = deadline;
                 project.status = status;
                 project.tags = tags;
+
+                // If deadline changed, update all task deadlines
+                if (oldDeadline !== deadline) {
+                    project.tasks.forEach(task => {
+                        task.deadline = deadline;
+                    });
+                }
                 
                 this.updateAllTags();
                 this.hideEditProjectModal();

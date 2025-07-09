@@ -3,11 +3,11 @@
 This file lists development tasks to ensure the application supports core features and functionality.
 
 ## Project and Task Editing
-- [ ] Allow editing of project and task details (description, deadline, star/favorite flag, focus toggle).
+- [x] Allow editing of project and task details (description, deadline, star/favorite flag, focus toggle).
 - [ ] Verify changes persist across all views (dashboard, list, card, kanban, etc.).
 
 ## Project Detail Navigation
-- [ ] Ensure every page that displays a project allows users to click through to view full project details.
+- [x] Ensure every page that displays a project allows users to click through to view full project details.
 
 ## Kanban/List/Card Views
 - [ ] Support editing projects directly within each view.
@@ -15,8 +15,8 @@ This file lists development tasks to ensure the application supports core featur
 - [ ] Enable drag-and-drop reordering and moving projects/tasks.
 
 ## Deadline Management
-- [ ] Changing a project deadline should automatically update all associated tasks to the same deadline.
-- [ ] Users can override individual task deadlines after the update.
+- [x] Changing a project deadline should automatically update all associated tasks to the same deadline.
+- [x] Users can override individual task deadlines after the update.
 
 ## Notes
 - [ ] Display a sticky note in the center of the screen with drag-and-drop functionality.
@@ -39,6 +39,6 @@ This file lists development tasks to ensure the application supports core featur
 - [x] Provide a visible indicator that focus mode is active.
 
 ## Search & Export
-- [ ] Add search functionality for tasks similar to project and note search.
+- [x] Add search functionality for tasks similar to project and note search.
 - [x] Implement the `exportAllData` method to write all user data to a chosen file.
 - [x] Remove unused HTML files (`renderer-backup.html` and `task-manager-phase4.html`) once all features are merged.
