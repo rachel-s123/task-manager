@@ -1674,6 +1674,25 @@
         .list-item:hover .list-item-actions {
             opacity: 1;
         }
+        .project-card-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .kanban-project-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            padding: 2px 4px;
+            color: #0700ff;
+            border-radius: 4px;
+        }
+        .kanban-project-btn:hover {
+            background: #e2fc0b44;
+        }
+
         
         /* KANBAN VIEW STYLES */
         .projects-kanban {
@@ -3439,6 +3458,7 @@
                         </div>
                         <div class="list-item-actions">
                             <button class="btn btn-outline" style="padding: 6px 12px; font-size: 13px;" onclick="event.stopPropagation(); window.taskManager.showEditProjectModal('${project.id}')">✏️ Edit</button>
+                            <button class="btn btn-primary" style="padding: 6px 12px; font-size: 13px;" onclick="event.stopPropagation(); window.taskManager.addTaskToProject('${project.id}')">➕ Task</button>
                             <button class="btn btn-primary" style="padding: 6px 12px; font-size: 13px;" onclick="event.stopPropagation(); window.taskManager.navigateToProject('${project.id}')">👁️ View</button>
                             <button class="btn btn-warning" style="padding: 6px 12px; font-size: 13px;" onclick="event.stopPropagation(); window.taskManager.toggleFocusProject('${project.id}')">🎯</button>
                         </div>
@@ -3494,8 +3514,13 @@
                         const projectTasks = tasksByProject[projectId];
                         // Project header
                         const projectHeader = document.createElement('div');
-                        projectHeader.style = 'font-weight: 600; color: #0700ff; margin: 8px 0 4px 0; font-size: 0.98rem;';
-                        projectHeader.textContent = projectTasks[0].projectName;
+                        projectHeader.style = 'font-weight: 600; color: #0700ff; margin: 8px 0 4px 0; font-size: 0.98rem; display:flex; justify-content: space-between; align-items:center;';
+                        projectHeader.innerHTML = `
+                            <span>${projectTasks[0].projectName}</span>
+                            <span>
+                                <button class="kanban-project-btn" onclick="event.stopPropagation(); window.taskManager.showEditProjectModal('${projectId}')">✏️</button>
+                                <button class="kanban-project-btn" onclick="event.stopPropagation(); window.taskManager.addTaskToProject('${projectId}')">➕</button>
+                            </span>`;
                         itemsContainer.appendChild(projectHeader);
                         // Tasks
                         projectTasks.forEach(task => {
@@ -3719,6 +3744,11 @@
                         <p class="context-text">
                             <span class="context-label">Context:</span> ${project.context}
                         </p>
+                    </div>
+
+                    <div class="project-card-actions">
+                        <button class="btn btn-outline" onclick="event.stopPropagation(); window.taskManager.showEditProjectModal('${project.id}')">✏️ Edit</button>
+                        <button class="btn btn-primary" onclick="event.stopPropagation(); window.taskManager.addTaskToProject('${project.id}')">➕ Task</button>
                     </div>
                 `;
                 
